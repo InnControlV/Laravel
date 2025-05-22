@@ -14,7 +14,7 @@ WORKDIR /var/www/html
 COPY composer.json composer.lock ./
 
 ENV COMPOSER_MEMORY_LIMIT=-1
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --force
 
 # Then copy the rest of the files
 COPY . .
