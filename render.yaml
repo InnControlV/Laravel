@@ -12,4 +12,3 @@ services:
         value: your-laravel-key
       - key: DB_CONNECTION
         value: mysql
-      # Add other environment variables here
