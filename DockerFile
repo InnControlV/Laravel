@@ -1,31 +1,27 @@
-# Use the official PHP image with Apache
 FROM php:8.2-apache
 
-# Install system dependencies
 RUN apt-get update && apt-get install -y \
     zip unzip git curl libpng-dev libonig-dev libxml2-dev libzip-dev \
     && docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd
 
-# Enable Apache rewrite module
 RUN a2enmod rewrite
 
-# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
 WORKDIR /var/www/html
 
-# Copy project files
+# Copy only composer files first for caching and isolated install
+COPY composer.json composer.lock ./
+
+ENV COMPOSER_MEMORY_LIMIT=-1
+RUN composer install --no-dev --optimize-autoloader
+
+# Then copy the rest of the files
 COPY . .
 
-# Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage
 
-# Run composer
-RUN composer install --no-dev --optimize-autoloader
-
-# Expose port 80
 EXPOSE 80
 
 CMD ["apache2-foreground"]
